@@ -1,4 +1,4 @@
-# sobolevn's dotfiles
+# sobolevn's dotfiles (Fork, work in progress)
 
 ![sobolevn's dotfiles](https://raw.githubusercontent.com/sobolevn/dotfiles/master/media/hyper.png)
 
