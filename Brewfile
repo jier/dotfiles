@@ -45,6 +45,9 @@ brew "gnupg"                  # For signing commits
 # === Editor ===
 brew "nano"                   # Simple terminal editor
 
+# === Python Development ===
+brew "uv"                     # Fast Python package installer and resolver
+
 # === Optional Applications ===
 # Uncomment what you need
 # cask "docker"               # Docker Desktop
