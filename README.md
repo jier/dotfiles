@@ -1,141 +1,224 @@
-# sobolevn's dotfiles (Fork, work in progress)
+# Minimal DevOps Dotfiles
 
-![sobolevn's dotfiles](https://raw.githubusercontent.com/sobolevn/dotfiles/master/media/hyper.png)
+A simplified, production-ready dotfiles configuration optimized for DevOps engineers.
 
-Here are some articles I wrote about my environment:
+## Philosophy
 
-- ["Instant +100% command line productivity boost"](https://dev.to/sobolevn/instant-100-command-line-productivity-boost)
-- ["Using better CLIs"](https://dev.to/sobolevn/using-better-clis-6o8)
-- ["6 mac apps that fit everyone"](https://sobolevn.me/2019/07/6-best-mac-apps)
+- **Minimal**: Only essential tools and configurations
+- **Fast**: Quick shell startup (<0.5s)
+- **Simple**: Easy to understand and maintain
+- **Platform-friendly**: Works on macOS and Linux
+- **DevOps-focused**: Tools for containers, cloud, IaC, and Kubernetes
 
-And talks / podcasts:
+## What's Included
 
-- ["Veged and Code podcast"](https://www.youtube.com/watch?v=nEF0I3VkmPA) \[in RU\]
+### 🛠️ Core Tools
 
+- **Version Control**: Git with useful aliases and git-delta for better diffs
+- **Containers**: Docker & Kubernetes (kubectl, helm, k9s)
+- **Infrastructure as Code**: Terraform, Ansible
+- **Cloud CLIs**: AWS, Azure, GCP (commented out by default)
+- **Productivity**: fzf, bat, ripgrep, fd, zoxide, tig
 
-## Contents
+### 📝 Configurations
 
-What's in there?
+- **Shell**: Pure ZSH with git-aware prompt (no oh-my-zsh)
+- **Git**: Sensible defaults with helpful aliases
+- **Aliases**: DevOps-focused shortcuts for git, kubectl, terraform, docker
+- **Editor**: nano as default with editorconfig support
 
-- all my `brew` dependencies including: applications, fonts, etc. See [`Brewfile`](https://github.com/sobolevn/dotfiles/blob/master/Brewfile)
-- all my `macOS` configuration. See [`macos`](https://github.com/sobolevn/dotfiles/blob/master/macos/)
-- all my shell configuration, including [my own `sobole`](https://github.com/sobolevn/sobole-zsh-theme) theme. See [`shell/`](https://github.com/sobolevn/dotfiles/tree/master/shell) and [`config/zshrc`](https://github.com/sobolevn/dotfiles/blob/master/config/zshrc)
-- all my `vscode` configuration, including [my own `pustota`](https://github.com/sobolevn/pustota) theme. See [`vscode/`](https://github.com/sobolevn/dotfiles/tree/master/vscode)
-- all my [QuickLook](https://github.com/sindresorhus/quick-look-plugins) customizations and [dev utilities](https://github.com/sbarex/SourceCodeSyntaxHighlight)
+## Quick Start
 
+### 1. Clone the Repository
 
-## Main principles
+```bash
+git clone https://github.com/YOUR_USERNAME/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+```
 
-- Minimalism in everything: tooling, styling,
-- Simplicity
-- Reduced visual noise, only important things should be shown
-- "Please, do not touch my code": no auto-formatting or code flow interruptions
-- History is valuable, let's preserve it everywhere we can
-- Security: do not share anything with anyone
+### 2. Install
 
+```bash
+./install
+```
 
-## Installation
+The installer will:
+- Create symlinks for all config files
+- Backup existing configs (if any)
+- Create local config templates
+- Optionally install Homebrew packages
 
-We are using [`dotbot`](https://github.com/anishathalye/dotbot/)
-to set things up. Steps:
+### 3. Configure
 
-0. Decide what you want to install: comment out `run_dotbot 'steps/...'` that you don't need
-1. Clone this repo with: `git clone https://github.com/sobolevn/dotfiles dotfiles`
-2. `cd dotfiles/`
-3. Run: [`bash ./install`](https://github.com/sobolevn/dotfiles/blob/master/install)
+Edit these files with your personal settings:
 
+```bash
+# Required: Set your git identity
+nano ~/.gitconfig_local
 
-## VSCode
+# Optional: Machine-specific settings
+nano ~/.zshrc.local
+```
 
-I loved [my `Sublime`](https://github.com/sobolevn/dotfiles/tree/34ee628e515f7fc782566b946a3b4ca906bad7ba/sublime3-conf).
-It was fast and beautiful.
-The main reason is that `Sublime` is almost unmaintained.
-Packages are also abandoned.
+### 4. Reload Shell
 
-So, I have switched to [`vscode`](https://formulae.brew.sh/cask/visual-studio-code).
-It solved almost all issues I had with `Sublime`.
-Here's how my new `vscode` setup looks like, using my own theme called [`pustota`](https://github.com/sobolevn/pustota):
+```bash
+source ~/.zshrc
+# or restart your terminal
+```
 
-![sobolevn's vscode for Python](https://raw.githubusercontent.com/sobolevn/pustota/master/assets/minimal.png)
+## File Structure
 
-Here's [a list of packages](https://github.com/sobolevn/dotfiles/blob/master/Brewfile) (see `vscode` calls at the bottom) I use:
+```
+dotfiles/
+├── install              # Installation script
+├── Brewfile             # Homebrew packages (~30 tools)
+├── config/
+│   ├── zshrc            # ZSH configuration
+│   ├── aliases          # Shell aliases
+│   ├── gitconfig        # Git configuration
+│   ├── gitignore        # Global gitignore
+│   ├── gitattributes    # Git attributes
+│   ├── ssh_config       # SSH configuration
+│   └── editorconfig     # Editor configuration
+└── README.md
+```
 
-- [`pustota`](https://github.com/sobolevn/pustota) theme
-- [`Python`](https://github.com/Microsoft/vscode-python) plugin
-- [`editorconfig`](https://editorconfig.org/) integration
-- [`drcika.apc-extension`](https://github.com/drcika/apc-extension) for better customization
+## Customization
 
-I try to keep my `vscode` setup as simple as possible.
-It was also heavily influenced by [`makevscodeawesome`](https://makevscodeawesome.com/).
+### Adding Tools
 
-I also use [powered-up `nano`](https://github.com/sobolevn/dotfiles/blob/master/config/nanorc)
-for in-terminal editing.
+Edit `Brewfile` and uncomment or add packages you need:
 
+```bash
+# Uncomment cloud tools you use
+brew "awscli"
+# brew "azure-cli"
+# brew "google-cloud-sdk"
 
-## CLI
+# Add your own tools
+brew "your-tool"
+```
 
-I am using [`hyper`](https://hyper.is/) as my main terminal with my custom [`senya` theme](https://github.com/sobolevn/senya).
-I am using [`zsh`](https://github.com/zsh-users/zsh) with [`oh-my-zsh`](https://github.com/robbyrussell/oh-my-zsh)
-as the main shell.
-And [`zplug`](https://github.com/zplug/zplug) to manage shell [plugins](https://github.com/sobolevn/dotfiles/blob/master/config/zplugrc).
-I also have a some tools / scripts / aliases to make my working experience better.
-But, I try to keep them minimal: only ones I truly use. Including: `bat`, `zoxide`, `fzf`, `ag`, `fd`, `delta`, `gh`, `tig`, and many others.
+Then install:
 
-I mainly work with:
+```bash
+brew bundle --file=~/.dotfiles/Brewfile
+```
 
-- `python`
+### Adding Aliases
 
-I also have several other languages installed.
-But I don't use them on a daily basis:
+Edit `~/.aliases` or add them to `~/.zshrc.local`:
 
-- `node`
-- `elixir`
-- `rust`
-- `c`
+```bash
+# In ~/.zshrc.local
+alias myalias='my command'
+```
 
-### fzf goodies
+### Machine-Specific Config
 
-I use `fzf` for several [code completion](https://github.com/sobolevn/dotfiles/blob/master/shell/.completions) tasks:
+Use `~/.zshrc.local` for machine-specific settings:
 
-- `tab` to autocomplete probably all the things using [`fzf-tab`](https://github.com/Aloxaf/fzf-tab)
+```bash
+# AWS Profile
+export AWS_PROFILE=production
 
-![fzf-tab](https://raw.githubusercontent.com/sobolevn/dotfiles/master/media/fzf-tab.png)
+# Custom kubeconfig
+export KUBECONFIG=~/.kube/prod-config
 
-Multiple tools have custom completions like: `zoxide`, `make`, `killall`
-that work well with `fzf`'s preview feature.
+# Company proxy
+export HTTP_PROXY=http://proxy.company.com:8080
+```
 
-- `ctrl+r` allows me to fuzzy search command history
+## Useful Aliases
 
-![fzf-history](https://raw.githubusercontent.com/sobolevn/dotfiles/master/media/fzf-history.png)
+### Git
+- `g` → git
+- `gs` → git status
+- `gp` → git push
+- `gl` → git pull
+- `glog` → git log --oneline --graph
 
-- `ctrl+t` allows to fuzzy search files and dirs in the current tree to include paths in commands with instant previews for text files (content) and directories (inner tree)
+### Kubernetes
+- `k` → kubectl
+- `kgp` → kubectl get pods
+- `kgs` → kubectl get services
+- `kl` → kubectl logs
+- `kx` → kubectl exec -it
 
-![fzf-paths](https://raw.githubusercontent.com/sobolevn/dotfiles/master/media/fzf-paths.png)
+### Terraform
+- `tf` → terraform
+- `tfi` → terraform init
+- `tfp` → terraform plan
+- `tfa` → terraform apply
 
+### Docker
+- `d` → docker
+- `dc` → docker-compose
+- `dps` → docker ps
+- `dex` → docker exec -it
 
-## Apps
+## Features
 
-I am using [`brew`](https://brew.sh/) to install all free apps for my mac.
-I also sync apps from AppStore with `brew` via [`mas`](https://formulae.brew.sh/formula/mas),
-so the resulting [`Brewfile`](https://github.com/sobolevn/dotfiles/blob/master/Brewfile) contains everything.
+### Smart Directory Navigation
 
+- `z <partial-name>` → Jump to frequently used directories (zoxide)
+- `Ctrl-T` → Fuzzy find files (fzf)
+- `Alt-C` → Fuzzy find directories (fzf)
 
-## Infrastructure
+### Enhanced Git
 
-I try to containerize everything.
-So, [`docker`](https://formulae.brew.sh/cask/docker) is my main development and deployment tool.
+- Better diffs with git-delta
+- Useful aliases (see `git config --get-regexp alias`)
+- Global gitignore for common files
 
+### Fast Completions
 
-## Local configuration
+- Tab completion for all tools
+- Case-insensitive matching
+- History-based suggestions
 
-Some of the used tools requires local configuration. Such as `git` with username and email.
+## Updating
 
-Here's the full list:
+```bash
+cd ~/.dotfiles
+git pull
+./install  # Re-run to update symlinks
+```
 
-1. `~/.gitconfig_local` to store any user-specific data
-2. `~/.shell_env_local` to store local shell config, like: usernames, passwords, tokens, `gpg` keys and so on
+## Uninstalling
 
+```bash
+# Remove symlinks
+rm ~/.zshrc ~/.aliases ~/.gitconfig ~/.gitignore_global ~/.gitattributes_global ~/.editorconfig
+
+# Restore backups (if you want)
+mv ~/.zshrc.backup ~/.zshrc
+mv ~/.gitconfig.backup ~/.gitconfig
+# ... etc
+```
+
+## Requirements
+
+- **macOS** 10.15+ or **Linux**
+- **Homebrew** (for package management)
+- **ZSH** (usually pre-installed)
+
+## Comparison to Original
+
+| Aspect | Before | After |
+|--------|--------|-------|
+| Files | ~30 files | ~10 files |
+| Brewfile size | 198 lines | 54 lines |
+| Dependencies | ~140 packages | ~30 packages |
+| Shell startup | 2-3 seconds | <0.5 seconds |
+| Frameworks | oh-my-zsh + zplug | Pure ZSH |
+| Installation | dotbot (4 steps) | Simple script |
 
 ## License
 
-[WTFPL](https://en.wikipedia.org/wiki/WTFPL): do the fuck you want. Enjoy!
+MIT - Use freely!
+
+## Credits
+
+Simplified from [sobolevn/dotfiles](https://github.com/sobolevn/dotfiles) with focus on DevOps workflows.

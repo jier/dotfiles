@@ -1,37 +1,105 @@
 #!/usr/bin/env bash
 
+# Minimal Dotfiles Installation Script
+# Simple symlink-based installation
+
 set -e
 
-# Exporting the specific shell we want to work with:
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-SHELL='/bin/bash'
-export SHELL
+echo "🚀 Installing minimal dotfiles..."
+echo "📁 Dotfiles directory: $DOTFILES_DIR"
+echo ""
 
-# Standard dotbot pre-configuration:
+# Function to create symlink
+create_symlink() {
+  local source="$1"
+  local target="$2"
 
-readonly DOTBOT_DIR='dotbot'
-readonly DOTBOT_BIN='bin/dotbot'
-readonly BASEDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  if [ -e "$target" ] || [ -L "$target" ]; then
+    echo "⚠️  Backing up existing: $target -> $target.backup"
+    mv "$target" "$target.backup"
+  fi
 
-readonly ARGS="$@"
-
-cd "$BASEDIR"
-git submodule sync --quiet --recursive
-git submodule update --init --recursive
-
-# Linking dotfiles:
-
-run_dotbot () {
-  local config
-  config="$1"
-
-  "$BASEDIR/$DOTBOT_DIR/$DOTBOT_BIN" \
-    -d "$BASEDIR" \
-    --plugin-dir dotbot-brewfile \
-    -c "$config" $ARGS
+  ln -sf "$source" "$target"
+  echo "✅ Linked: $target -> $source"
 }
 
-run_dotbot 'steps/terminal.yml' || true
-run_dotbot 'steps/dependencies.yml' || true
-run_dotbot 'steps/vscode.yml' || true
-run_dotbot 'steps/streamdeck.yml' || true
+# === Shell Configuration ===
+echo "🐚 Setting up shell configuration..."
+create_symlink "$DOTFILES_DIR/config/zshrc" "$HOME/.zshrc"
+create_symlink "$DOTFILES_DIR/config/aliases" "$HOME/.aliases"
+
+# === Git Configuration ===
+echo ""
+echo "📝 Setting up git configuration..."
+create_symlink "$DOTFILES_DIR/config/gitconfig" "$HOME/.gitconfig"
+create_symlink "$DOTFILES_DIR/config/gitignore" "$HOME/.gitignore_global"
+create_symlink "$DOTFILES_DIR/config/gitattributes" "$HOME/.gitattributes_global"
+
+# === SSH Configuration ===
+if [ ! -d "$HOME/.ssh" ]; then
+  mkdir -p "$HOME/.ssh"
+  chmod 700 "$HOME/.ssh"
+fi
+create_symlink "$DOTFILES_DIR/config/ssh_config" "$HOME/.ssh/config"
+
+# === Editor Configuration ===
+echo ""
+echo "✏️  Setting up editor configuration..."
+create_symlink "$DOTFILES_DIR/config/editorconfig" "$HOME/.editorconfig"
+
+# === Create local config files ===
+echo ""
+echo "📋 Creating local config templates..."
+
+if [ ! -f "$HOME/.zshrc.local" ]; then
+  cat > "$HOME/.zshrc.local" << 'EOF'
+# Local ZSH configuration
+# Put machine-specific settings, secrets, tokens here
+# This file is gitignored and won't be committed
+
+# Example:
+# export AWS_PROFILE=myprofile
+# export KUBECONFIG=~/.kube/custom-config
+
+EOF
+  echo "✅ Created: ~/.zshrc.local"
+fi
+
+if [ ! -f "$HOME/.gitconfig_local" ]; then
+  cat > "$HOME/.gitconfig_local" << 'EOF'
+[user]
+  name = Your Name
+  email = your.email@example.com
+
+# Uncomment and configure if using GPG signing:
+# [user]
+#   signingkey = YOUR_GPG_KEY_ID
+
+EOF
+  echo "✅ Created: ~/.gitconfig_local (⚠️  EDIT THIS FILE!)"
+fi
+
+# === Install Homebrew packages ===
+echo ""
+read -p "📦 Install Homebrew packages from Brewfile? (y/N) " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+  if command -v brew &> /dev/null; then
+    echo "🍺 Installing Homebrew packages..."
+    brew bundle --file="$DOTFILES_DIR/Brewfile"
+  else
+    echo "⚠️  Homebrew not found. Install from https://brew.sh"
+  fi
+fi
+
+echo ""
+echo "✨ Installation complete!"
+echo ""
+echo "📌 Next steps:"
+echo "  1. Edit ~/.gitconfig_local with your name and email"
+echo "  2. Edit ~/.zshrc.local for machine-specific settings"
+echo "  3. Restart your shell or run: source ~/.zshrc"
+echo "  4. Review Brewfile and uncomment tools you need"
+echo ""

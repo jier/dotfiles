@@ -1,0 +1,61 @@
+# Minimal DevOps Aliases
+
+# === Git ===
+alias g='git'
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit'
+alias gp='git push'
+alias gl='git pull'
+alias gd='git diff'
+alias gco='git checkout'
+alias gb='git branch'
+alias glog='git log --oneline --graph --decorate'
+
+# === Kubernetes ===
+alias k='kubectl'
+alias kgp='kubectl get pods'
+alias kgs='kubectl get services'
+alias kgd='kubectl get deployments'
+alias kgn='kubectl get nodes'
+alias kdp='kubectl describe pod'
+alias kl='kubectl logs'
+alias klf='kubectl logs -f'
+alias kx='kubectl exec -it'
+alias kctx='kubectl config current-context'
+alias kns='kubectl config set-context --current --namespace'
+
+# === Terraform ===
+alias tf='terraform'
+alias tfi='terraform init'
+alias tfp='terraform plan'
+alias tfa='terraform apply'
+alias tfd='terraform destroy'
+alias tfv='terraform validate'
+alias tff='terraform fmt'
+
+# === Docker ===
+alias d='docker'
+alias dc='docker-compose'
+alias dps='docker ps'
+alias dpsa='docker ps -a'
+alias di='docker images'
+alias dex='docker exec -it'
+alias dlogs='docker logs'
+alias dlogsf='docker logs -f'
+
+# === Directory Navigation ===
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias z='zoxide'
+
+# === File Operations ===
+alias ls='ls --color=auto -h'
+alias ll='ls -lah'
+alias la='ls -A'
+alias cat='bat --plain --paging=never'
+
+# === System ===
+alias reload='source ~/.zshrc'
+alias path='echo $PATH | tr ":" "\n"'
