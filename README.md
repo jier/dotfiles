@@ -36,7 +36,15 @@ git clone https://github.com/YOUR_USERNAME/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 ```
 
-### 2. Install
+### 2. Test First (Optional)
+
+Preview what will be installed without making changes:
+
+```bash
+./install --dry-run
+```
+
+### 3. Install
 
 ```bash
 ./install
@@ -48,7 +56,12 @@ The installer will:
 - Create local config templates
 - Optionally install Homebrew packages
 
-### 3. Configure
+**Install Options:**
+- `./install` - Normal installation
+- `./install --dry-run` or `./install -n` - Preview changes without installing
+- `./install --help` or `./install -h` - Show help message
+
+### 4. Configure
 
 Edit these files with your personal settings:
 
@@ -60,7 +73,7 @@ nano ~/.gitconfig_local
 nano ~/.zshrc.local
 ```
 
-### 4. Reload Shell
+### 5. Reload Shell
 
 ```bash
 source ~/.zshrc

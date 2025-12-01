@@ -6,6 +6,36 @@
 set -e
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DRY_RUN=false
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --dry-run|-n)
+      DRY_RUN=true
+      shift
+      ;;
+    --help|-h)
+      echo "Usage: ./install [OPTIONS]"
+      echo ""
+      echo "Options:"
+      echo "  --dry-run, -n    Show what would be done without making changes"
+      echo "  --help, -h       Show this help message"
+      echo ""
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1"
+      echo "Use --help for usage information"
+      exit 1
+      ;;
+  esac
+done
+
+if [ "$DRY_RUN" = true ]; then
+  echo "🔍 DRY RUN MODE - No changes will be made"
+  echo ""
+fi
 
 echo "🚀 Installing minimal dotfiles..."
 echo "📁 Dotfiles directory: $DOTFILES_DIR"
@@ -16,13 +46,19 @@ create_symlink() {
   local source="$1"
   local target="$2"
 
-  if [ -e "$target" ] || [ -L "$target" ]; then
-    echo "⚠️  Backing up existing: $target -> $target.backup"
-    mv "$target" "$target.backup"
+  if [ "$DRY_RUN" = true ]; then
+    if [ -e "$target" ] || [ -L "$target" ]; then
+      echo "⚠️  Would backup: $target -> $target.backup"
+    fi
+    echo "🔗 Would link: $target -> $source"
+  else
+    if [ -e "$target" ] || [ -L "$target" ]; then
+      echo "⚠️  Backing up existing: $target -> $target.backup"
+      mv "$target" "$target.backup"
+    fi
+    ln -sf "$source" "$target"
+    echo "✅ Linked: $target -> $source"
   fi
-
-  ln -sf "$source" "$target"
-  echo "✅ Linked: $target -> $source"
 }
 
 # === Shell Configuration ===
@@ -39,8 +75,12 @@ create_symlink "$DOTFILES_DIR/config/gitattributes" "$HOME/.gitattributes_global
 
 # === SSH Configuration ===
 if [ ! -d "$HOME/.ssh" ]; then
-  mkdir -p "$HOME/.ssh"
-  chmod 700 "$HOME/.ssh"
+  if [ "$DRY_RUN" = true ]; then
+    echo "📁 Would create: $HOME/.ssh (with permissions 700)"
+  else
+    mkdir -p "$HOME/.ssh"
+    chmod 700 "$HOME/.ssh"
+  fi
 fi
 create_symlink "$DOTFILES_DIR/config/ssh_config" "$HOME/.ssh/config"
 
@@ -54,7 +94,10 @@ echo ""
 echo "📋 Creating local config templates..."
 
 if [ ! -f "$HOME/.zshrc.local" ]; then
-  cat > "$HOME/.zshrc.local" << 'EOF'
+  if [ "$DRY_RUN" = true ]; then
+    echo "📝 Would create: ~/.zshrc.local"
+  else
+    cat > "$HOME/.zshrc.local" << 'EOF'
 # Local ZSH configuration
 # Put machine-specific settings, secrets, tokens here
 # This file is gitignored and won't be committed
@@ -64,11 +107,17 @@ if [ ! -f "$HOME/.zshrc.local" ]; then
 # export KUBECONFIG=~/.kube/custom-config
 
 EOF
-  echo "✅ Created: ~/.zshrc.local"
+    echo "✅ Created: ~/.zshrc.local"
+  fi
+else
+  echo "ℹ️  Already exists: ~/.zshrc.local"
 fi
 
 if [ ! -f "$HOME/.gitconfig_local" ]; then
-  cat > "$HOME/.gitconfig_local" << 'EOF'
+  if [ "$DRY_RUN" = true ]; then
+    echo "📝 Would create: ~/.gitconfig_local"
+  else
+    cat > "$HOME/.gitconfig_local" << 'EOF'
 [user]
   name = Your Name
   email = your.email@example.com
@@ -78,28 +127,48 @@ if [ ! -f "$HOME/.gitconfig_local" ]; then
 #   signingkey = YOUR_GPG_KEY_ID
 
 EOF
-  echo "✅ Created: ~/.gitconfig_local (⚠️  EDIT THIS FILE!)"
+    echo "✅ Created: ~/.gitconfig_local (⚠️  EDIT THIS FILE!)"
+  fi
+else
+  echo "ℹ️  Already exists: ~/.gitconfig_local"
 fi
 
 # === Install Homebrew packages ===
-echo ""
-read -p "📦 Install Homebrew packages from Brewfile? (y/N) " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
+if [ "$DRY_RUN" = false ]; then
+  echo ""
+  read -p "📦 Install Homebrew packages from Brewfile? (y/N) " -n 1 -r
+  echo
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    if command -v brew &> /dev/null; then
+      echo "🍺 Installing Homebrew packages..."
+      brew bundle --file="$DOTFILES_DIR/Brewfile"
+    else
+      echo "⚠️  Homebrew not found. Install from https://brew.sh"
+    fi
+  fi
+else
+  echo ""
+  echo "📦 Would prompt to install Homebrew packages from Brewfile"
   if command -v brew &> /dev/null; then
-    echo "🍺 Installing Homebrew packages..."
-    brew bundle --file="$DOTFILES_DIR/Brewfile"
+    echo "   (Homebrew is installed)"
   else
-    echo "⚠️  Homebrew not found. Install from https://brew.sh"
+    echo "   (Homebrew is NOT installed)"
   fi
 fi
 
 echo ""
-echo "✨ Installation complete!"
-echo ""
-echo "📌 Next steps:"
-echo "  1. Edit ~/.gitconfig_local with your name and email"
-echo "  2. Edit ~/.zshrc.local for machine-specific settings"
-echo "  3. Restart your shell or run: source ~/.zshrc"
-echo "  4. Review Brewfile and uncomment tools you need"
+if [ "$DRY_RUN" = true ]; then
+  echo "✨ Dry run complete - no changes were made!"
+  echo ""
+  echo "📌 To actually install, run:"
+  echo "   ./install"
+else
+  echo "✨ Installation complete!"
+  echo ""
+  echo "📌 Next steps:"
+  echo "  1. Edit ~/.gitconfig_local with your name and email"
+  echo "  2. Edit ~/.zshrc.local for machine-specific settings"
+  echo "  3. Restart your shell or run: source ~/.zshrc"
+  echo "  4. Review Brewfile and uncomment tools you need"
+fi
 echo ""
