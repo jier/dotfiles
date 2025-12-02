@@ -1,0 +1,54 @@
+# Minimal DevOps Packages for Debian/Ubuntu (apt)
+# Install with: sudo apt update && xargs sudo apt install -y < packages.apt
+
+# === Core Utilities ===
+git
+gh                      # GitHub CLI (requires GitHub CLI repo)
+curl
+wget
+jq                      # JSON processor
+yq                      # YAML processor (install via snap or binary)
+tree
+
+# === Container & Orchestration ===
+# kubectl                # Install from Kubernetes repo
+# helm                   # Install from Helm repo
+# k9s                    # Install via binary or snap
+
+# === Infrastructure as Code ===
+# terraform              # Install from HashiCorp repo
+# ansible                # Available in Ubuntu repos
+
+# === Productivity Tools ===
+fzf                     # Fuzzy finder
+bat                     # Better cat (package name: batcat on Ubuntu)
+fd-find                 # Better find (command: fdfind)
+ripgrep                 # Better grep
+# zoxide                 # Install via cargo or binary
+tig                     # Git TUI
+# git-delta              # Install via cargo or binary
+
+# === Monitoring & Debugging ===
+htop                    # Process viewer
+
+# === Shell ===
+zsh
+shellcheck              # Shell script linting
+
+# === Security ===
+gnupg                   # For signing commits
+
+# === Editor ===
+nano                    # Simple terminal editor
+
+# === Python Development ===
+# uv                     # Install via pip or cargo
+
+# Note: Some packages need additional repos or installation methods:
+# - kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+# - helm: https://helm.sh/docs/intro/install/
+# - terraform: https://developer.hashicorp.com/terraform/install
+# - k9s: https://k9scli.io/topics/install/
+# - zoxide: cargo install zoxide OR download binary
+# - git-delta: cargo install git-delta OR download binary
+# - uv: pip install uv OR cargo install uv

@@ -84,8 +84,10 @@ source ~/.zshrc
 
 ```
 dotfiles/
-├── install              # Installation script
-├── Brewfile             # Homebrew packages (~30 tools)
+├── install              # Smart installer with OS detection
+├── install-apt.sh       # APT installer for Debian/Ubuntu
+├── Brewfile             # Homebrew packages (macOS/Linux)
+├── packages.apt         # APT package reference (Debian/Ubuntu)
 ├── config/
 │   ├── zshrc            # ZSH configuration
 │   ├── aliases          # Shell aliases
@@ -94,7 +96,7 @@ dotfiles/
 │   ├── gitattributes    # Git attributes
 │   ├── ssh_config       # SSH configuration
 │   └── editorconfig     # Editor configuration
-└── README.md
+└── README.md            # This file
 ```
 
 ## Customization
@@ -214,8 +216,73 @@ mv ~/.gitconfig.backup ~/.gitconfig
 ## Requirements
 
 - **macOS** 10.15+ or **Linux**
-- **Homebrew** (for package management)
 - **ZSH** (usually pre-installed)
+- **Package manager**: Homebrew (macOS/Linux) or APT (Debian/Ubuntu)
+
+## Platform Support
+
+This dotfiles setup supports multiple platforms with automatic detection:
+
+### macOS
+
+**Recommended**: Use Homebrew (installed by default on modern macOS)
+
+```bash
+# If Homebrew is not installed:
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Then run the installer:
+./install
+```
+
+The installer will use the `Brewfile` to install packages.
+
+### Linux with Homebrew
+
+**Option 1**: Install Homebrew on Linux (works on most distributions)
+
+```bash
+# Install Homebrew for Linux:
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Then run the installer:
+./install
+```
+
+The installer will use the `Brewfile` to install packages.
+
+### Debian/Ubuntu (without Homebrew)
+
+**Option 2**: Use the native APT installer
+
+```bash
+# Run the installer:
+./install
+
+# When prompted, choose to install via APT
+# Or run directly:
+./install-apt.sh
+```
+
+The `install-apt.sh` script will:
+- Install packages from Ubuntu/Debian repositories
+- Add necessary third-party repositories (GitHub CLI, Kubernetes, HashiCorp, etc.)
+- Download and install binary releases where needed (k9s, git-delta, etc.)
+- Create proper symlinks for Ubuntu package names (batcat → bat, fdfind → fd)
+
+### Other Linux Distributions
+
+For other distributions (Fedora, Arch, etc.):
+
+1. **Recommended**: Install Homebrew for Linux (easiest)
+2. **Manual**: Use `packages.apt` as a reference for package names
+3. **Adapt**: Create your own package list for your package manager
+
+## Package Files
+
+- **Brewfile**: Homebrew packages (macOS and Linux with Homebrew)
+- **packages.apt**: Reference list for Debian/Ubuntu packages
+- **install-apt.sh**: Automated installer for Debian/Ubuntu systems
 
 ## Comparison to Original
 

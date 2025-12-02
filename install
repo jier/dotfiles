@@ -133,26 +133,50 @@ else
   echo "ℹ️  Already exists: ~/.gitconfig_local"
 fi
 
-# === Install Homebrew packages ===
+# === Install Packages ===
 if [ "$DRY_RUN" = false ]; then
   echo ""
-  read -p "📦 Install Homebrew packages from Brewfile? (y/N) " -n 1 -r
-  echo
-  if [[ $REPLY =~ ^[Yy]$ ]]; then
-    if command -v brew &> /dev/null; then
+
+  # Detect OS and package manager
+  if command -v brew &> /dev/null; then
+    # Homebrew is installed (macOS or Linux with Homebrew)
+    read -p "📦 Install packages via Homebrew? (y/N) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
       echo "🍺 Installing Homebrew packages..."
       brew bundle --file="$DOTFILES_DIR/Brewfile"
-    else
-      echo "⚠️  Homebrew not found. Install from https://brew.sh"
     fi
+  elif [[ "$OSTYPE" == "linux-gnu"* ]] && command -v apt-get &> /dev/null; then
+    # Debian/Ubuntu
+    echo "🐧 Detected Debian/Ubuntu system"
+    read -p "📦 Install packages via APT? (y/N) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+      "$DOTFILES_DIR/install-apt.sh"
+    fi
+  elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    # Other Linux
+    echo "🐧 Detected Linux system without Homebrew or APT"
+    echo ""
+    echo "Installation options:"
+    echo "  1. Install Homebrew for Linux: https://docs.brew.sh/Homebrew-on-Linux"
+    echo "  2. See packages.apt for package names to install manually"
+    echo "  3. Install packages manually for your distribution"
+  else
+    echo "⚠️  Could not detect package manager"
+    echo "   - For macOS: Install Homebrew from https://brew.sh"
+    echo "   - For Linux: Install Homebrew from https://docs.brew.sh/Homebrew-on-Linux"
+    echo "   - Or see packages.apt for package names"
   fi
 else
   echo ""
-  echo "📦 Would prompt to install Homebrew packages from Brewfile"
+  echo "📦 Package installation (dry run):"
   if command -v brew &> /dev/null; then
-    echo "   (Homebrew is installed)"
+    echo "   Would use: Homebrew (brew bundle)"
+  elif [[ "$OSTYPE" == "linux-gnu"* ]] && command -v apt-get &> /dev/null; then
+    echo "   Would use: APT (./install-apt.sh)"
   else
-    echo "   (Homebrew is NOT installed)"
+    echo "   Would show: Installation instructions for your system"
   fi
 fi
 
@@ -169,6 +193,8 @@ else
   echo "  1. Edit ~/.gitconfig_local with your name and email"
   echo "  2. Edit ~/.zshrc.local for machine-specific settings"
   echo "  3. Restart your shell or run: source ~/.zshrc"
-  echo "  4. Review Brewfile and uncomment tools you need"
+  echo "  4. Review package files and uncomment tools you need:"
+  echo "     - Brewfile (for Homebrew on macOS/Linux)"
+  echo "     - packages.apt (for Debian/Ubuntu reference)"
 fi
 echo ""
