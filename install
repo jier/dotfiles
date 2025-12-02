@@ -175,6 +175,8 @@ else
     echo "   Would use: Homebrew (brew bundle)"
   elif [[ "$OSTYPE" == "linux-gnu"* ]] && command -v apt-get &> /dev/null; then
     echo "   Would use: APT (./install-apt.sh)"
+    echo ""
+    "$DOTFILES_DIR/install-apt.sh" --dry-run
   else
     echo "   Would show: Installation instructions for your system"
   fi
