@@ -256,6 +256,9 @@ The installer will use the `Brewfile` to install packages.
 **Option 2**: Use the native APT installer
 
 ```bash
+# Test first (optional):
+./install-apt.sh --dry-run
+
 # Run the installer:
 ./install
 
@@ -263,6 +266,11 @@ The installer will use the `Brewfile` to install packages.
 # Or run directly:
 ./install-apt.sh
 ```
+
+**Install-apt.sh Options:**
+- `./install-apt.sh` - Normal installation
+- `./install-apt.sh --dry-run` or `-n` - Preview what would be installed
+- `./install-apt.sh --help` or `-h` - Show help message
 
 The `install-apt.sh` script will:
 - Install packages from Ubuntu/Debian repositories
@@ -282,18 +290,19 @@ For other distributions (Fedora, Arch, etc.):
 
 - **Brewfile**: Homebrew packages (macOS and Linux with Homebrew)
 - **packages.apt**: Reference list for Debian/Ubuntu packages
-- **install-apt.sh**: Automated installer for Debian/Ubuntu systems
+- **install-apt.sh**: Automated installer for Debian/Ubuntu systems (supports --dry-run)
 
 ## Comparison to Original
 
 | Aspect | Before | After |
 |--------|--------|-------|
-| Files | ~30 files | ~10 files |
-| Brewfile size | 198 lines | 54 lines |
+| Files | ~30 files | ~15 files |
+| Brewfile size | 198 lines | 56 lines |
 | Dependencies | ~140 packages | ~30 packages |
 | Shell startup | 2-3 seconds | <0.5 seconds |
 | Frameworks | oh-my-zsh + zplug | Pure ZSH |
-| Installation | dotbot (4 steps) | Simple script |
+| Installation | dotbot (4 steps) | Multi-platform script |
+| Platform support | macOS only | macOS + Linux (Homebrew/APT) |
 
 ## License
 
