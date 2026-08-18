@@ -6,6 +6,44 @@
 set -e
 
 DRY_RUN=false
+DOWNLOAD_DIR=""
+
+cleanup() {
+  if [ -n "$DOWNLOAD_DIR" ]; then
+    rm -rf -- "$DOWNLOAD_DIR"
+  fi
+}
+
+ensure_download_dir() {
+  if [ -z "$DOWNLOAD_DIR" ]; then
+    DOWNLOAD_DIR=$(mktemp -d)
+  fi
+}
+
+trap cleanup EXIT
+
+download_verified_release_asset() {
+  local release_json="$1"
+  local asset_name="$2"
+  local destination="$3"
+  local asset_url
+  local digest
+
+  asset_url=$(jq -r --arg name "$asset_name" '.assets[] | select(.name == $name) | .browser_download_url' <<< "$release_json")
+  digest=$(jq -r --arg name "$asset_name" '.assets[] | select(.name == $name) | .digest' <<< "$release_json")
+
+  if [ -z "$asset_url" ] || [ "$asset_url" = "null" ]; then
+    echo "Release asset not found: $asset_name" >&2
+    return 1
+  fi
+  if [[ "$digest" != sha256:* ]]; then
+    echo "No SHA-256 digest published for: $asset_name" >&2
+    return 1
+  fi
+
+  curl -fsSL "$asset_url" -o "$destination"
+  echo "${digest#sha256:}  $destination" | sha256sum --check --status
+}
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -165,10 +203,19 @@ if ! command -v k9s &> /dev/null; then
     read -p "📥 Install k9s? (y/N) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-      K9S_VERSION=$(curl -s https://api.github.com/repos/derailed/k9s/releases/latest | grep tag_name | cut -d '"' -f 4)
-      wget -q "https://github.com/derailed/k9s/releases/download/${K9S_VERSION}/k9s_Linux_amd64.tar.gz" -O /tmp/k9s.tar.gz
-      sudo tar -C /usr/local/bin -xzf /tmp/k9s.tar.gz k9s
-      rm /tmp/k9s.tar.gz
+      K9S_ARCH=$(dpkg --print-architecture)
+      case "$K9S_ARCH" in
+        amd64|arm64) ;;
+        *)
+          echo "Unsupported k9s architecture: $K9S_ARCH" >&2
+          exit 1
+          ;;
+      esac
+      K9S_RELEASE=$(curl -fsSL https://api.github.com/repos/derailed/k9s/releases/latest)
+      K9S_ASSET="k9s_Linux_${K9S_ARCH}.tar.gz"
+      ensure_download_dir
+      download_verified_release_asset "$K9S_RELEASE" "$K9S_ASSET" "$DOWNLOAD_DIR/k9s.tar.gz"
+      sudo tar -C /usr/local/bin -xzf "$DOWNLOAD_DIR/k9s.tar.gz" k9s
       echo "✅ k9s installed"
     fi
   else
@@ -201,10 +248,20 @@ if ! command -v delta &> /dev/null; then
     read -p "📥 Install git-delta? (y/N) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-      DELTA_VERSION=$(curl -s https://api.github.com/repos/dandavison/delta/releases/latest | grep tag_name | cut -d '"' -f 4)
-      wget -q "https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}/git-delta_${DELTA_VERSION}_amd64.deb" -O /tmp/git-delta.deb
-      sudo dpkg -i /tmp/git-delta.deb
-      rm /tmp/git-delta.deb
+      DELTA_ARCH=$(dpkg --print-architecture)
+      case "$DELTA_ARCH" in
+        amd64|arm64|armhf) ;;
+        *)
+          echo "Unsupported git-delta architecture: $DELTA_ARCH" >&2
+          exit 1
+          ;;
+      esac
+      DELTA_RELEASE=$(curl -fsSL https://api.github.com/repos/dandavison/delta/releases/latest)
+      DELTA_VERSION=$(jq -r '.tag_name' <<< "$DELTA_RELEASE")
+      DELTA_ASSET="git-delta_${DELTA_VERSION}_${DELTA_ARCH}.deb"
+      ensure_download_dir
+      download_verified_release_asset "$DELTA_RELEASE" "$DELTA_ASSET" "$DOWNLOAD_DIR/git-delta.deb"
+      sudo dpkg -i "$DOWNLOAD_DIR/git-delta.deb"
       echo "✅ git-delta installed"
     fi
   else

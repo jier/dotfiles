@@ -51,7 +51,11 @@ alias ....='cd ../../..'
 alias z='zoxide'
 
 # === File Operations ===
-alias ls='ls --color=auto -h'
+if ls --color=auto -d . >/dev/null 2>&1; then
+  alias ls='ls --color=auto -h'
+else
+  alias ls='ls -Gh'
+fi
 alias ll='ls -lah'
 alias la='ls -A'
 alias cat='bat --plain --paging=never'

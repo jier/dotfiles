@@ -1,0 +1,33 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  shell:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install validation tools
+        run: |
+          if command -v brew >/dev/null; then
+            brew install shellcheck
+          else
+            sudo apt-get update
+            sudo apt-get install --yes shellcheck zsh
+          fi
+      - name: Check Bash scripts
+        run: shellcheck install install-apt.sh
+      - name: Parse Zsh configuration
+        run: |
+          zsh -n config/zshrc
+          zsh -n config/aliases
+      - name: Exercise dry run
+        run: HOME="$(mktemp -d)" ./install --dry-run

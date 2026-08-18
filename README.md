@@ -1,6 +1,6 @@
 # Minimal DevOps Dotfiles
 
-A simplified, production-ready dotfiles configuration optimized for DevOps engineers.
+A small dotfiles configuration optimized for personal DevOps workflows.
 
 ## Philosophy
 
@@ -32,7 +32,7 @@ A simplified, production-ready dotfiles configuration optimized for DevOps engin
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/dotfiles.git ~/.dotfiles
+git clone https://github.com/jier/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 ```
 
@@ -235,7 +235,8 @@ This dotfiles setup supports multiple platforms with automatic detection:
 ./install
 ```
 
-The installer will use the `Brewfile` to install packages.
+The installer will use the `Brewfile` to install packages, including the
+macOS-only application casks.
 
 ### Linux with Homebrew
 
@@ -249,7 +250,8 @@ The installer will use the `Brewfile` to install packages.
 ./install
 ```
 
-The installer will use the `Brewfile` to install packages.
+The installer will use the formulae in the `Brewfile` and skip macOS-only
+application casks.
 
 ### Debian/Ubuntu (without Homebrew)
 
@@ -298,6 +300,12 @@ For other distributions (Fedora, Arch, etc.):
 ## License
 
 MIT - Use freely!
+
+## Validation
+
+Pull requests and pushes run ShellCheck against the Bash installers, parse the
+Zsh configuration, and execute the installer in dry-run mode on Linux and
+macOS.
 
 ## Credits
 

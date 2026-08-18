@@ -49,8 +49,10 @@ brew "nano"                   # Simple terminal editor
 brew "uv"                     # Fast Python package installer and resolver
 
 # === Optional Applications ===
-# Uncomment what you need
-# cask "docker"               # Docker Desktop
-# cask "visual-studio-code"   # VS Code
-# cask "iterm2"               # Better terminal for macOS
-# cask "rectangle"            # Window management for macOS
+# These casks are macOS-only; Linux installations keep using the formulae above.
+if OS.mac?
+  cask "docker"               # Docker Desktop
+  cask "iterm2"               # Better terminal for macOS
+  cask "rectangle"            # Window management for macOS
+  # cask "visual-studio-code"  # VS Code
+end

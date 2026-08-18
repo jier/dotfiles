@@ -50,9 +50,6 @@
 [rerere]
   enabled = true
 
-[credential]
-  helper = osxkeychain
-
 # === Useful Aliases ===
 [alias]
   # Publishing branches

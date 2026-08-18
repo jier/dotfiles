@@ -37,6 +37,18 @@ if [ "$DRY_RUN" = true ]; then
   echo ""
 fi
 
+configure_macos_credentials() {
+  if [[ "$OSTYPE" != "darwin"* ]]; then
+    return
+  fi
+
+  if [ "$DRY_RUN" = true ]; then
+    echo "🔐 Would ensure macOS Keychain Git credential storage"
+  elif ! git config --file "$HOME/.gitconfig_local" --get-all credential.helper 2>/dev/null | grep -Fxq osxkeychain; then
+    git config --file "$HOME/.gitconfig_local" --add credential.helper osxkeychain
+  fi
+}
+
 echo "🚀 Installing minimal dotfiles..."
 echo "📁 Dotfiles directory: $DOTFILES_DIR"
 echo ""
@@ -132,6 +144,7 @@ EOF
 else
   echo "ℹ️  Already exists: ~/.gitconfig_local"
 fi
+configure_macos_credentials
 
 # === Install Packages ===
 if [ "$DRY_RUN" = false ]; then
